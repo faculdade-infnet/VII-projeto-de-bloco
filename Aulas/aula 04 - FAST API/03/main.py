@@ -21,7 +21,7 @@ class Produto(BaseModel):
 def buscar_produto(produto_id: int):
     for produto in produtos:
         if produto["id"] == produto_id:
-            return produtos
+            return produto
 
     # Se não encontrar, retorna erro 404 corretamente
     raise HTTPException(
