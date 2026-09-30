@@ -1,0 +1,128 @@
+# EXCUTAR APLICAÇÃO COMPLETO
+
+```bash
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+py -m pip install -r requirements.txt
+fastapi dev main.py
+```
+
+## Pastas
+
+1.  example, hello world
+2.  get exception
+3.  model paydantic
+4.  produtos completo
+
+## Pré-requisitos
+
+- VS Code
+- Python 3.10 ou superior
+- pip
+- **Só no Windows:** permitir execução de scripts no PowerShell (necessário só uma vez)
+
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+## Instruções de instalação
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/<usuario>/<nome-do-repositorio>.git
+cd <nome-do-repositorio>
+```
+
+2. Abra o projeto e acesse a pasta da API:
+
+```bash
+cd .\fastapi
+```
+
+3. Crie e ative um ambiente virtual:
+   - Verifique se está dentro da pasta "fastapi"
+
+```bash
+# Criar mabiente virtual
+py -m venv .venv
+
+# Windows - Ative o ambiente virtual
+.venv\Scripts\Activate.ps1
+
+# Linux/Mac - Ative o ambiente virtual
+source .venv/bin/activate
+```
+
+4. Instale as dependências a partir do arquivo requirements.txt:
+
+```bash
+py -m pip install -r requirements.txt
+```
+
+5. Verifique se foi instalado corretamente (deve aparecer name, location e outras informações sobre o pacote)
+
+```bash
+py -m pip show fastapi
+```
+
+## Instruções de execução
+
+1. Acesse a pasta da API e certifique-se de que o ambiente virtual está ativado (veja passo 3 da instalação, caso tenha aberto um novo terminal):
+
+```bash
+cd .\fastapi
+```
+
+2. Execute a aplicação:
+
+```bash
+fastapi dev main.py
+```
+
+ou
+
+```bash
+uvicorn main:app --reload
+```
+
+3. A API estará disponível em:
+   http://127.0.0.1:8000/docs
+
+# Extras
+
+1. Apagar tudo e recriar o ambiente virtual
+
+   **Windows (PowerShell):**
+
+```bash
+deactivate
+Remove-Item -Recurse -Force .venv
+```
+
+**Linux/Mac:**
+
+```bash
+deactivate
+rm -rf .venv
+```
+
+2. Criar requirements.txt
+
+```bash
+py -m pip freeze > requirements.txt
+```
+
+<details>
+<summary>Acesar rotas protegidas</summary>
+1. Conforme imagem abaixo, clique em Authorize e informe usuário (admin)  e senha (admin)
+
+![Descrição](images/oAuth2.png)
+
+2. Após estar autenticado voce poderá acessar a rota 'listar_produtos_limite_protegido'
+
+Obs. na pratica é igual a outra rota, porém agora necessita de autenticaçã o para acesso
+
+![Descrição](images/rota_protegida.png)
+
+</details>
