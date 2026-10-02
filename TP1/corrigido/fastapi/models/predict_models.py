@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 
 
-# Texto da mensagem/ticket enviado pelo cliente."
+# Modelo de entrada da rota /predict
+# Recebe o texto da mensagem/ticket enviado pelo cliente
 class PredictRequest(BaseModel):
-    text: str
+    text: str   # texto do ticket que será classificado
 
 
-# Saída rota /predict_não implementeada ainda."
+# Modelo de saída da rota /predict
 class PredictResponse(BaseModel):
-    intent: str
+    intent: str   # intenção/categoria identificada no ticket
