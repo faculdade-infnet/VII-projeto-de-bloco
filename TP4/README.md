@@ -1,10 +1,10 @@
 # Projeto de Bloco: Análise e Segurança de Agentes de IA
 
-# TP4 - Questões ()
+# TP4 - Questões (8)
 
 # Modo de Uso:
 
-- No projeto tem um arquivo pdf com todas as questões resolvidas com descrição das soluções implementadas
-- No projeto constam também os arquivos python.py quando solicitado nas questões
+- Pasta entregue se refere ao projeto avaliado
+- Pasta corrigido se refere ao projeto avaliado com as correções
 
 ![Descrição](documentos/enunciado_TP4.png)

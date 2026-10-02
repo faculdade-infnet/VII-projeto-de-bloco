@@ -14,8 +14,8 @@
 1. Clone o repositório:
 
 ```bash
-   git clone https://github.com/<usuario>/<nome-do-repositorio>.git
-   cd <nome-do-repositorio>
+   git clone https://github.com/infnet26-alberto-johanna-samuel-uendel/tp01.git
+   cd tp01/fastapi
 ```
 
 2. Abra o projeto e acesse a pasta da API:
