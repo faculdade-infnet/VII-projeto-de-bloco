@@ -1,7 +1,9 @@
 from sqlmodel import create_engine, Session
 
+DATABASE_NAME = "database.db"
+
 # Endereço do banco de dados: usa SQLite e o arquivo database.db
-DATABASE_URL = "sqlite:///database.db"
+DATABASE_URL = f"sqlite:///{DATABASE_NAME}"
 
 # Cria a conexão com o banco, que vai ser usada pelo resto da aplicação
 engine = create_engine(DATABASE_URL)
