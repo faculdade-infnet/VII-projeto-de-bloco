@@ -1,0 +1,26 @@
+name: Testes de segurança
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v7
+
+      - name: Diagnóstico Repositório
+        run: |
+          pwd
+          ls
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar testes
+        working-directory: .
+        env:
+          PYTHONPATH: .
+        run: pytest tests/ -v
