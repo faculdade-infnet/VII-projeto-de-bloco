@@ -17,7 +17,7 @@ limiter = Limiter(key_func=get_remote_address)
 # Justificativa: um usuário de verdade dificilmente erra a senha mais de 10 vezes em 1 minuto,
 # então o limite não atrapalha o uso normal. Já um ataque de força bruta precisa testar muitas
 # senhas bem rápido. Com o limite, o atacante fica preso a 10 tentativas por minuto.
-@router.post("/token", summary="Login", response_model=Token)
+@router.post("/token", summary="Gerar token", response_model=Token)
 @limiter.limit("10/minute")
 def login(
     request: Request,  # Obrigatório: o SlowAPI precisa da requisição para saber o IP do cliente

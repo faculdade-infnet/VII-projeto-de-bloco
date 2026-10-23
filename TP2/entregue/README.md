@@ -102,8 +102,8 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 **1. Clone o repositório e acesse a pasta da API**
 
 ```bash
-git clone https://github.com/infnet26-alberto-johanna-samuel-uendel/alberto_johanna_samuel_uendel_tp2.git
-cd alberto_johanna_samuel_uendel_tp2/fastapi
+git clone https://github.com/infnet26-alberto-johanna-samuel-uendel/tp02.git
+cd tp02/fastapi
 ```
 
 **2. Crie e ative o ambiente virtual**
@@ -151,11 +151,11 @@ O script usa a biblioteca `sqlite3` para criar as tabelas `user` e `prediction` 
 iniciais. Antes de criar, ele apaga as tabelas existentes, então pode ser executado quantas vezes for
 necessário. Cada prediction tem um `owner_id` que identifica seu proprietário:
 
-| Prediction | Texto                         | Proprietário |
-| ---------- | ----------------------------- | ------------ |
-| 1          | Meu pedido não chegou         | `admin`      |
-| 2          | Quero cancelar minha compra   | `admin`      |
-| 3          | Qual o prazo de entrega?      | `jose`       |
+| Prediction | Texto                       | Proprietário |
+| ---------- | --------------------------- | ------------ |
+| 1          | Meu pedido não chegou       | `admin`      |
+| 2          | Quero cancelar minha compra | `admin`      |
+| 3          | Qual o prazo de entrega?    | `jose`       |
 
 Se o arquivo `database.db` não existir quando a API for iniciada, o `main.py` executa o
 `sqlite_database.py` automaticamente.
@@ -228,7 +228,10 @@ curl -X POST http://127.0.0.1:8000/predict \
 ```
 
 ```json
-{ "message": "Meu produto chegou com defeito e quero devolver", "intent": "Technical issue" }
+{
+  "message": "Meu produto chegou com defeito e quero devolver",
+  "intent": "Technical issue"
+}
 ```
 
 Sem token válido, a rota responde **401**.
@@ -241,13 +244,13 @@ prediction, pois ela é dele; `GET /predictions/1` responde **404**, pois perten
 
 #### Controles de segurança
 
-| Controle             | Como foi implementado                                                                                                                          |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Campos extras        | Modelos Pydantic com `extra='forbid'`: campo não definido no modelo → **422**                                                                  |
-| Ownership (BOLA)     | As rotas de predictions filtram pelo `owner_id` do usuário logado; o recurso de outro usuário não é retornado (**404**)                       |
+| Controle             | Como foi implementado                                                                                                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Campos extras        | Modelos Pydantic com `extra='forbid'`: campo não definido no modelo → **422**                                                                                                                                                                     |
+| Ownership (BOLA)     | As rotas de predictions filtram pelo `owner_id` do usuário logado; o recurso de outro usuário não é retornado (**404**)                                                                                                                           |
 | Headers de segurança | Middleware adiciona `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options` e `Content-Security-Policy` em todas as respostas. O CSP é restritivo nas rotas da API e liberado para o CDN do Swagger apenas em `/docs` e `/redoc` |
-| CORS                 | Middleware `CORSMiddleware` com lista explícita de origens permitidas (sem `*`)                                                                |
-| Rate limiting        | SlowAPI no `POST /auth/token`: **10 requisições por minuto por cliente** (IP); a 11ª recebe **429**                                            |
+| CORS                 | Middleware `CORSMiddleware` com lista explícita de origens permitidas (sem `*`)                                                                                                                                                                   |
+| Rate limiting        | SlowAPI no `POST /auth/token`: **10 requisições por minuto por cliente** (IP); a 11ª recebe **429**                                                                                                                                               |
 
 **Justificativa do limite de 10 requisições por minuto:** um usuário legítimo raramente erra a senha mais
 do que algumas vezes seguidas, então 10 tentativas por minuto não atrapalham o uso normal. Já um ataque de
@@ -289,11 +292,11 @@ python -m pytest tests/ -v
 
 Os testes cobrem:
 
-| Arquivo                               | Teste                             | Resultado esperado                       |
-| ------------------------------------- | --------------------------------- | ---------------------------------------- |
-| `tests/test_sem_token.py`             | Acesso a rota protegida sem token | **401**                                  |
-| `tests/test_recurso_outro_usuario.py` | Acesso a recurso de outro usuário | **404**, o recurso **não** é retornado   |
-| `tests/test_campo_extra_body.py`      | Envio de campo extra no body      | **422**                                  |
+| Arquivo                               | Teste                             | Resultado esperado                     |
+| ------------------------------------- | --------------------------------- | -------------------------------------- |
+| `tests/test_sem_token.py`             | Acesso a rota protegida sem token | **401**                                |
+| `tests/test_recurso_outro_usuario.py` | Acesso a recurso de outro usuário | **404**, o recurso **não** é retornado |
+| `tests/test_campo_extra_body.py`      | Envio de campo extra no body      | **422**                                |
 
 > Cada execução faz 2 logins. Executar os testes mais de 5 vezes no mesmo minuto ultrapassa o rate limit de
 > `/auth/token` (10 por minuto) e o login passa a responder **429**. Nesse caso, basta aguardar 1 minuto.
@@ -366,8 +369,8 @@ TP2/
 
 ## Responsabilidades e dependências
 
-| Módulo      | Responsabilidade                                                                     | Depende de           |
-| ----------- | ------------------------------------------------------------------------------------ | -------------------- |
+| Módulo      | Responsabilidade                                                                     | Depende de                       |
+| ----------- | ------------------------------------------------------------------------------------ | -------------------------------- |
 | `main.py`   | Cria o app FastAPI, registra os routers, os middlewares de segurança e o rate limit  | `routes`, `database`             |
 | `routes/`   | Define os endpoints. Não tem lógica de segurança, só chama as funções de `security`  | `models`, `security`, `database` |
 | `models/`   | Modelos Pydantic que validam a entrada e a saída e tabelas SQLModel do banco         | nenhum                           |
