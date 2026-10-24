@@ -34,7 +34,7 @@ jobs:
   pytest:
     # Máquina onde o job roda: Linux Ubuntu nova e vazia, criada pelo GitHub
     # e descartada no final
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04    # versão fixa, em vez de ubuntu-latest
 
     # ----------------------------------------------------------
     # CONFIGURAÇÃO PADRÃO DOS COMANDOS "run"
@@ -56,11 +56,11 @@ jobs:
       #    Sem este passo a máquina está vazia (não existe requirements.txt nem tests/).
       #    uses = usa uma action pronta · actions/ = oficiais do GitHub · @v4 = versão
       - name: Baixar código do repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 2. Instala o Python na versão escolhida, a mesma usada no PC (3.10)
       - name: Instalar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
 
