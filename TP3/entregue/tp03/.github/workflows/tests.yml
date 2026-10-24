@@ -1,17 +1,18 @@
-# .github/workflows/tests.yaml  (na raiz do repositório, que é o próprio projeto)
+# .github/workflows/tests.yml
 name: Testes de segurança
 
-# QUANDO O WORKFLOW RODA (gatilhos / eventos)
+# Roda automaticamente a cada push
 on:
-  push:  
+  push:
 
-  # Permite rodar na mão: botão "Run workflow" na aba Actions
-  workflow_dispatch:
+jobs:
+  pytest:
+    runs-on: ubuntu-24.04
 
-# TAREFAS (JOBS) QUE O WORKFLOW EXECUTA
-jobs:  
-  pytest:    
-    runs-on: ubuntu-24.04   
+    # A API e a pasta tests/ ficam dentro de "fastapi", onde os comandos rodam
+    defaults:
+      run:
+        working-directory: fastapi
 
     steps:
       # 1. Obter o código do repositório
@@ -23,8 +24,8 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.10"
-      
-      # 3. Instala as bibliotecas do projeto (FastAPI, SQLModel, ...)
+
+      # 3. Instalar as dependências
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
