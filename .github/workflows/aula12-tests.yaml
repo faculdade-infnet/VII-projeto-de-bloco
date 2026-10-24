@@ -1,0 +1,86 @@
+# .github/workflows/aula12-tests.yaml  (na raiz do repositório)
+
+# ------------------------------------------------------------
+# NOME DO WORKFLOW - Nome que aparece na aba "Actions" do GitHub
+# ------------------------------------------------------------
+name: Testes de segurança - Aula 12
+
+
+# ------------------------------------------------------------
+# QUANDO O WORKFLOW RODA (gatilhos / eventos)
+# ------------------------------------------------------------
+on:
+  # Roda a cada "git push"...
+  push:
+    # ...mas só se o push alterou algum destes caminhos
+    paths:
+      - "Aulas/aula 12 - FAST API/**"           # qualquer arquivo da pasta da aula 12 (** = todas as subpastas)
+      - ".github/workflows/aula12-tests.yaml"   # ou o próprio workflow (para testar mudanças nele)
+
+  # Roda quando alguém abre ou atualiza um Pull Request que mexe na aula 12
+  pull_request:
+    paths:
+      - "Aulas/aula 12 - FAST API/**"
+
+  # Permite rodar na mão: botão "Run workflow" na aba Actions
+  workflow_dispatch:
+
+
+# ------------------------------------------------------------
+# TAREFAS (JOBS) QUE O WORKFLOW EXECUTA
+# ------------------------------------------------------------
+jobs:
+  # Nome do job (aparece na aba Actions ao clicar no workflow)
+  pytest:
+    # Máquina onde o job roda: Linux Ubuntu nova e vazia, criada pelo GitHub
+    # e descartada no final
+    runs-on: ubuntu-latest
+
+    # ----------------------------------------------------------
+    # CONFIGURAÇÃO PADRÃO DOS COMANDOS "run"
+    # Todos os "run" abaixo são executados dentro da pasta da aula,
+    # e não na raiz do repositório.
+    # Aspas obrigatórias por causa dos espaços no nome da pasta.
+    # (não vale para os steps com "uses", só para os com "run")
+    # ----------------------------------------------------------
+    defaults:
+      run:
+        working-directory: "Aulas/aula 12 - FAST API"
+
+    # ----------------------------------------------------------
+    # PASSOS (STEPS) DO JOB, executados em ordem, de cima para baixo.
+    # Se um step falhar, os próximos não rodam e o job fica vermelho.
+    # ----------------------------------------------------------
+    steps:
+      # 1. Baixa o código do repositório para dentro da máquina.
+      #    Sem este passo a máquina está vazia (não existe requirements.txt nem tests/).
+      #    uses = usa uma action pronta · actions/ = oficiais do GitHub · @v4 = versão
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      # 2. Instala o Python na versão escolhida, a mesma usada no PC (3.10)
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # 3. Diagnóstico: mostra em qual pasta está (pwd) e o que tem nela (ls).
+      #    Serve para conferir no log se está dentro de "Aulas/aula 12 - FAST API".
+      #    O "|" permite escrever vários comandos, um por linha.
+      - name: Diagnóstico Repositório
+        run: |
+          pwd
+          ls
+
+      # 4. Instala as bibliotecas do projeto (FastAPI, SQLModel, SlowAPI, PyJWT, pytest, httpx...)
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      # 5. Executa os testes da pasta tests/
+      #    PYTHONPATH=. faz o "from main import app" dos testes encontrar o main.py.
+      #    Se algum teste falhar → exit code 1 → job com X vermelho.
+      #    Se todos passarem   → exit code 0 → job verde.
+      - name: Executar testes
+        env:
+          PYTHONPATH: .
+        run: pytest tests/ -v
