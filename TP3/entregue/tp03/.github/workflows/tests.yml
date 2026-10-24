@@ -1,0 +1,71 @@
+# .github/workflows/tests.yaml  (na raiz do repositório, que é o próprio projeto)
+
+# ------------------------------------------------------------
+# NOME DO WORKFLOW - Nome que aparece na aba "Actions" do GitHub
+# ------------------------------------------------------------
+name: Testes de segurança
+
+
+# ------------------------------------------------------------
+# QUANDO O WORKFLOW RODA (gatilhos / eventos)
+# ------------------------------------------------------------
+on:
+  # Roda a cada "git push" (qualquer arquivo alterado)
+  push:
+
+  # Roda quando alguém abre ou atualiza um Pull Request
+  pull_request:
+
+  # Permite rodar na mão: botão "Run workflow" na aba Actions
+  workflow_dispatch:
+
+
+# ------------------------------------------------------------
+# TAREFAS (JOBS) QUE O WORKFLOW EXECUTA
+# ------------------------------------------------------------
+jobs:
+  # Nome do job (aparece na aba Actions ao clicar no workflow)
+  pytest:
+    # Máquina onde o job roda: Linux Ubuntu nova e vazia, criada pelo GitHub
+    # e descartada no final
+    runs-on: ubuntu-24.04    # versão fixa, em vez de ubuntu-latest
+
+    # ----------------------------------------------------------
+    # PASSOS (STEPS) DO JOB, executados em ordem, de cima para baixo.
+    # Se um step falhar, os próximos não rodam e o job fica vermelho.
+    # Não precisa de "working-directory": os comandos já rodam na raiz,
+    # que é onde estão o main.py, o requirements.txt e a pasta tests/.
+    # ----------------------------------------------------------
+    steps:
+      # 1. Baixa o código do repositório para dentro da máquina.
+      #    Sem este passo a máquina está vazia (não existe requirements.txt nem tests/).
+      #    uses = usa uma action pronta · actions/ = oficiais do GitHub · @v7 = versão
+      - name: Baixar código do repositório
+        uses: actions/checkout@v7
+
+      # 2. Instala o Python na versão escolhida, a mesma usada no PC (3.10)
+      - name: Instalar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      # 3. Diagnóstico: mostra em qual pasta está (pwd) e o que tem nela (ls).
+      #    Deve listar main.py, requirements.txt, tests/ ...
+      #    O "|" permite escrever vários comandos, um por linha.
+      - name: Diagnóstico Repositório
+        run: |
+          pwd
+          ls
+
+      # 4. Instala as bibliotecas do projeto (FastAPI, SQLModel, SlowAPI, PyJWT, pytest, httpx...)
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      # 5. Executa os testes da pasta tests/
+      #    PYTHONPATH=. faz o "from main import app" dos testes encontrar o main.py.
+      #    Se algum teste falhar → exit code 1 → job com X vermelho.
+      #    Se todos passarem   → exit code 0 → job verde.
+      - name: Executar testes
+        env:
+          PYTHONPATH: .
+        run: pytest tests/ -v
