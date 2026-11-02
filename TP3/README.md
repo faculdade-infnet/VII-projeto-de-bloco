@@ -1,6 +1,6 @@
 # Projeto de Bloco: Análise e Segurança de Agentes de IA
 
-# TP3 - Questões (8)
+# TP3 - Questões (6)
 
 # Modo de Uso:
 
