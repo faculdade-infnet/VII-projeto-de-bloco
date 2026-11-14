@@ -1,4 +1,5 @@
 import joblib
+from agent import classificar   # função que roda o agente (do agent.py na raiz)
 from fastapi import APIRouter, Depends, HTTPException, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -202,3 +203,51 @@ def get_all_predicitons_limited(
 
     # Devolve a lista de previsões
     return predictions
+
+
+# ---------------------------------------------------------------------------
+# ROTA - Classifica a intenção do usuário pelo teste do EDA
+# ---------------------------------------------------------------------------
+@router.post("/classify_padrao")
+def classify(request: PredictionRequest):
+    # carrega o modelo e o vetorizador salvos no notebook
+    modelo = joblib.load("melhor_classificador_intent.joblib")
+    vectorizer = joblib.load("vectorizer.joblib")
+
+    texto = request.message.strip()       # tira os espaços do começo e do fim
+    if not texto:
+        raise HTTPException(
+            status_code=422,
+            detail="A mensagem não pode estar vazia"
+        )
+
+    # matriz com 1 linha (a mensagem), como mesmas colunas de treino
+    X = vectorizer.transform([texto])                 
+    intent = modelo.predict(X)[0]                     # [0] = (intenção)a única previsão
+    probability = modelo.predict_proba(X).max()       # probabilidade da classe prevista
+
+    return {
+        "intent": str(intent),
+        "probability": float(probability)
+    }
+
+
+# ---------------------------------------------------------------------------
+# ROTA - Protótipo: sempre devolve "cancelamento" (sem usar o LLM)
+# ---------------------------------------------------------------------------
+@router.post("/classify_semllm")
+def classify_semllm(predictionRequest: PredictionRequest):
+    predictionResponse = PredictionResponse(
+        message=predictionRequest.message,   # devolve a mesma mensagem
+        intent='cancelamento',               # intenção fixa (é um protótipo)
+        probability=0.99                     # probabilidade fixa
+    )
+    return predictionResponse
+
+# ---------------------------------------------------------------------------
+# ROTA - Usa o agente de IA, que chama o classificador como ferramenta
+# ---------------------------------------------------------------------------
+@router.post("/classify_comllm")
+def classify_comllm(predictionRequest: PredictionRequest):
+    resposta = classificar(predictionRequest.message)   # roda o agente com a mensagem
+    return {"response": resposta.final_output}          # a resposta final do agente
