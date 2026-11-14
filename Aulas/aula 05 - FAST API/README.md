@@ -117,12 +117,12 @@ py -m pip freeze > requirements.txt
 <summary>Acesar rotas protegidas</summary>
 1. Conforme imagem abaixo, clique em Authorize e informe usuário (admin)  e senha (admin)
 
-![Descrição](images/oAuth2.png)
+![Descrição](docs/oAuth2.png)
 
 2. Após estar autenticado voce poderá acessar a rota 'listar_produtos_limite_protegido'
 
 Obs. na pratica é igual a outra rota, porém agora necessita de autenticaçã o para acesso
 
-![Descrição](images/rota_protegida.png)
+![Descrição](docs/rota_protegida.png)
 
 </details>

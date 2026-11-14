@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()   # tem que vir ANTES dos imports que usam a chave
 import os
 import runpy
 import time

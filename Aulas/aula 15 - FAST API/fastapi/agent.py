@@ -34,6 +34,7 @@ def classificar_intencao(texto: str) -> str:
 def configurar_agent():
     agent = Agent(
         name="Atendente",                       # nome do agente
+        # model="gpt-4.1-nano",                   # <- modelo escolhido (mais barato)
         instructions=instructions,              # o system prompt lá de cima
         tools=[classificar_intencao],           # ferramentas que o agente pode usar
         tool_use_behavior="stop_on_first_tool", # retorna o resultado da ferramenta direto, sem o LLM reescrever

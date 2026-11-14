@@ -208,7 +208,25 @@ def get_all_predicitons_limited(
 # ---------------------------------------------------------------------------
 # ROTA - Classifica a intenção do usuário pelo teste do EDA
 # ---------------------------------------------------------------------------
-@router.post("/classify_padrao")
+@router.post("/classify_padrao",
+            summary="(Sem LLM) Classificar a intenção da mensagem do usuário",
+            description="""
+Descobre qual é a **intenção** da mensagem usando o modelo que treinamos no notebook. Essa rota não usa IA (LLM).
+
+**Autenticação:** não precisa de token.
+
+**Como testar:**
+1. Clique em **Try it out**
+2. Mande uma mensagem, por exemplo: <br>
+    - `{"message": "I want to cancel my order"}` ou
+    - `{"message": "I need help"}`
+3. Clique em **Execute**
+4. Se mandar a mensagem vazia, dá erro `422`
+
+**Respostas:**
+- `200`: a intenção e a probabilidade
+- `422`: mensagem vazia ou faltando
+""")
 def classify(request: PredictionRequest):
     # carrega o modelo e o vetorizador salvos no notebook
     modelo = joblib.load("melhor_classificador_intent.joblib")
@@ -235,7 +253,24 @@ def classify(request: PredictionRequest):
 # ---------------------------------------------------------------------------
 # ROTA - Protótipo: sempre devolve "cancelamento" (sem usar o LLM)
 # ---------------------------------------------------------------------------
-@router.post("/classify_semllm")
+@router.post("/classify_semllm",
+            summary="(Sem LLM) Protótipo que sempre responde 'cancelamento'",
+            description="""
+Essa rota é só um **teste**. Não usa o modelo nem a IA, então a resposta é **sempre igual**.
+
+Ela devolve a mensagem enviada com a intenção `cancelamento` e a probabilidade `0.99`.
+
+**Autenticação:** não precisa de token.
+
+**Como testar:**
+1. Clique em **Try it out**
+2. Mande qualquer mensagem, por exemplo: `{"message": "qual o horário de atendimento?"}`
+3. Clique em **Execute**: a resposta vai ser sempre `cancelamento`
+
+**Respostas:**
+- `200`: a mensagem, a intenção `cancelamento` e a probabilidade `0.99`
+- `422`: mensagem faltando
+""")
 def classify_semllm(predictionRequest: PredictionRequest):
     predictionResponse = PredictionResponse(
         message=predictionRequest.message,   # devolve a mesma mensagem
@@ -247,7 +282,35 @@ def classify_semllm(predictionRequest: PredictionRequest):
 # ---------------------------------------------------------------------------
 # ROTA - Usa o agente de IA, que chama o classificador como ferramenta
 # ---------------------------------------------------------------------------
-@router.post("/classify_comllm")
+@router.post("/classify_comllm",
+            summary="(Com LLM) Classificar a intenção usando o agente de IA",
+            description="""
+Usa um **agente de IA** para descobrir a intenção. O agente usa o nosso modelo como ferramenta e depois escreve a resposta.
+
+**Autenticação:** não precisa de token.
+
+**Atenção:** precisa da **chave da API** no `.env`, e cada teste gasta tokens.
+
+**Como testar:**
+1. Clique em **Try it out**
+2. Mande uma mensagem, por exemplo: `{"message": "meu pedido chegou quebrado, quero trocar"}`
+3. Clique em **Execute** e veja a resposta do agente
+
+**Respostas:**
+- `200`: a resposta do agente
+- `422`: mensagem faltando
+- `500`: deu erro na IA (chave errada, acabaram os tokens ou o site está fora do ar)
+""")
 def classify_comllm(predictionRequest: PredictionRequest):
     resposta = classificar(predictionRequest.message)   # roda o agente com a mensagem
+
+    # dados de consumo desta requisição
+    uso = resposta.context_wrapper.usage
+    print(
+        f"[tokens] entrada={uso.input_tokens} "
+        f"saída={uso.output_tokens} "
+        f"total={uso.total_tokens} "
+        f"chamadas={uso.requests}"
+    )
+
     return {"response": resposta.final_output}          # a resposta final do agente
