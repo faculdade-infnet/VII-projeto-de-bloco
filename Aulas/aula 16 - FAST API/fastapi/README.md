@@ -11,7 +11,7 @@ uvicorn main:app --reload
 # ou executar
 uvicorn main:app --port 8000 --reload
 
-# # ou executar
+# ou executar
 fastapi dev main.py
 ```
 
@@ -115,7 +115,11 @@ fastapi dev main.py
 
 ```bash
 deactivate
+# remover .venv
 Remove-Item -Recurse -Force .venv
+
+# limpar py-chache
+Get-ChildItem -Path . -Include __pycache__ -Recurse -Directory | Remove-Item -Recurse -Force
 ```
 
 2. Criar requirements.txt
@@ -176,11 +180,12 @@ Essa rota é só um **protótipo**, **sem LLM**.
 
 ---
 
-## 3️⃣ Testar `/classify_comllm`
+## 4️⃣ Testar `/classify_comllm_groq`
 
-Essa é a rota do **agente de verdade**.
+Essa é a rota do **agente com o Groq** (LLM **grátis**), no lugar da OpenAI.
 
-- Clique em `POST /classify_comllm` → **Try it out**
+- Precisa da `GROQ_API_KEY` no `.env` (grátis em `https://console.groq.com/keys`).
+- Clique em `POST /classify_comllm_groq` → **Try it out**
 - Mande:
 
 ```json
@@ -192,6 +197,8 @@ Essa é a rota do **agente de verdade**.
 ```json
 { "response": "Intenção: cancel_order. Probability: 0.99" }
 ```
+
+- Funciona igual ao `/classify_comllm`, mas **sem gastar crédito** (usa o modelo `openai/gpt-oss-20b` do Groq)
 
 ---
 
@@ -206,22 +213,7 @@ Esses testes mostram as **validações** da API:
 
 ## ⚠️ Se der erro
 
-Se o `/classify_padrao` e o `/classify_semllm` funcionarem, mas o `/classify_comllm` der erro, veja **qual erro aparece no terminal**.
+Se o `/classify_padrao` e o `/classify_semllm` funcionarem, mas a rota do agente der erro, veja **qual erro aparece no terminal**.
 
-O mais comum é a **chave da OpenAI sem crédito** (`insufficient_quota`). Esse é justamente o caso que o **Groq** (aula 16) resolve.
-
-# Modelos disponíveis (para o parâmetro `model` do Agent)
-
-Ordenados do mais barato (topo) ao mais caro (base). Preços por 1 milhão de tokens.
-
-| Modelo (`model="..."`) | Entrada /1M | Saída /1M | Indicado para                                            |
-| ---------------------- | ----------- | --------- | -------------------------------------------------------- |
-| `gpt-4.1-nano`         | $0,10       | $0,40     | Classificação, roteamento, inferência ultrabarata        |
-| `gpt-4o-mini`          | $0,15       | $0,60     | Tarefas de alto volume com orçamento apertado            |
-| `gpt-5.6-luna`         | $0,20       | $1,20     | **Padrão do SDK** (usado quando `model` não é informado) |
-| `gpt-4.1-mini`         | $0,40       | $1,60     | Tarefas rápidas que precisam de contexto longo           |
-| `gpt-4.1`              | $2,00       | $8,00     | Código, seguir instruções, contexto longo (1M)           |
-| `gpt-4o`               | $2,50       | $10,00    | Multimodal de uso geral                                  |
-
-> Preços de lista (podem mudar). O valor real cobrado é o que aparece em
-> https://platform.openai.com/usage
+- **`/classify_comllm` (OpenAI):** o mais comum é a chave **sem crédito** (`insufficient_quota`). Esse é justamente o caso que o **Groq** (aula 16) resolve — use a rota `/classify_comllm_groq`.
+- **`/classify_comllm_groq` (Groq):** se fizer **muitas chamadas seguidas**, pode dar `429` (limite do plano grátis por minuto). É só **esperar um pouco** e tentar de novo.

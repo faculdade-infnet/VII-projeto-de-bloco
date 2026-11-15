@@ -1,5 +1,7 @@
+import os   # garante que tem este (usa os.environ)
 import requests                                                # para chamar a rota /classify_padrao por HTTP
-from agents import function_tool, Agent, Runner, ModelSettings  # classes do OpenAI Agents SDK
+from openai import AsyncOpenAI
+from agents import function_tool, Agent, Runner, ModelSettings, OpenAIChatCompletionsModel  # OpenAI Agents SDK (compatível com o Groq)
 
 # System prompt: regras fixas de comportamento do agente
 instructions = """
@@ -30,15 +32,28 @@ def classificar_intencao(texto: str) -> str:
     return (f"Intenção: {dados['intent']}. \
         Probability: {dados['probability']}")
 
+
 # Monta o agente com a ferramenta e os parâmetros que forçam a resposta determinística
 def configurar_agent():
+    # cria o cliente apontando pro Groq (chave + url base)
+    client = AsyncOpenAI(
+        api_key=os.environ["GROQ_API_KEY"],
+        base_url="https://api.groq.com/openai/v1"
+    )
+    # cria o modelo do Groq
+    model = OpenAIChatCompletionsModel(
+        model="openai/gpt-oss-20b",
+        openai_client=client
+    )
     agent = Agent(
-        name="Atendente",                       # nome do agente
-        # model="gpt-4.1-nano",                   # <- modelo escolhido (mais barato)
-        instructions=instructions,              # o system prompt lá de cima
-        tools=[classificar_intencao],           # ferramentas que o agente pode usar
-        tool_use_behavior="stop_on_first_tool", # retorna o resultado da ferramenta direto, sem o LLM reescrever
-        model_settings=ModelSettings(tool_choice="classificar_intencao")  # OBRIGA o agente a chamar essa ferramenta
+        name="Atendente",             # nome do agente
+        model=model,                  # <- modelo do Groq
+        instructions=instructions,    # o system prompt lá de cima
+        tools=[classificar_intencao], # ferramentas que o agente pode usar
+        # retorna o resultado da ferramenta direto, sem o LLM reescrever
+        tool_use_behavior="stop_on_first_tool",
+        # OBRIGA o agente a chamar essa ferramenta
+        model_settings=ModelSettings(tool_choice="classificar_intencao")
     )
     return agent
 
