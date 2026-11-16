@@ -12,6 +12,7 @@ from database.connection import engine
 from routes.auth_route import router as auth_router
 from routes.prediction_route import router as prediction_router
 from routes.prediction_route import limiter as prediction_limiter
+from routes.health import router as helth
 
 # Se o arquivo do banco ainda não existe
 if not os.path.exists("database.db"):  
@@ -81,23 +82,6 @@ async def security_headers(request: Request, call_next):
     return response
 
 
-# ROTA - raiz da API, usada para conferir se a aplicação está no ar
-@app.get("/home", tags=["Status"], summary="Verificar se a API está no ar",
-             description="""
-Rota simples para conferir se a API está funcionando.
-
-**Autenticação:** não precisa de token.
-
-**Como testar:** clique em **Try it out** e depois em **Execute**.
-
-**Respostas:**
-- `200`: a API está no ar → `{"message": "ok"}`
-"""                                              # ← texto completo (aparece ao abrir a rota)
-)
-@app.get("/", include_in_schema=False)   # "/" continua respondendo, mas não aparece no /docs
-def home():
-    return {"message": "ok"}
-
-
 app.include_router(auth_router)        # Add rotas de autenticação
 app.include_router(prediction_router)  # Add rotas de previsão
+app.include_router(helth) 

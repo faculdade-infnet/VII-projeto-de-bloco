@@ -1,9 +1,10 @@
+import os
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import encode, decode, InvalidTokenError
 
-SECRET_KEY = "minha-chave-secreta"  # Chave usada para assinar e validar os tokens
+SECRET_KEY = os.environ["JWT_SECRET_KEY"]  # chave vem da variável de ambiente
 
 # Pega o token do cabeçalho Authorization e indica a rota de login
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")  

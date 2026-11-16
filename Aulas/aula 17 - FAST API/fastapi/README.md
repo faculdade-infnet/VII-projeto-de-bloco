@@ -217,3 +217,18 @@ Se o `/classify_padrao` e o `/classify_semllm` funcionarem, mas a rota do agente
 
 - **`/classify_comllm` (OpenAI):** o mais comum é a chave **sem crédito** (`insufficient_quota`). Esse é justamente o caso que o **Groq** (aula 16) resolve — use a rota `/classify_comllm_groq`.
 - **`/classify_comllm_groq` (Groq):** se fizer **muitas chamadas seguidas**, pode dar `429` (limite do plano grátis por minuto). É só **esperar um pouco** e tentar de novo.
+
+# Instalação do JWT TOOL
+
+```bash
+# FAZER TUDO DENTRO DO .venv
+# segundo terminal: clonar e instalar a ferramenta
+git clone https://github.com/ticarpi/jwt_tool.git
+cd jwt_tool
+
+# instalar as dependências dentro do jwt_tool
+py -m pip install -r requirements.txt
+
+# conferir se instalou (mostra a ajuda)
+py jwt_tool.py -h
+```

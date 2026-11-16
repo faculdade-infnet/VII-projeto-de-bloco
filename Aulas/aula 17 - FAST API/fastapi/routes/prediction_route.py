@@ -13,14 +13,16 @@ from security.dependencies import get_current_user
 
 
 
-router = APIRouter(tags=["Previsões"])  # Grupo de rotas de previsão
+router = APIRouter()  # Grupo de rotas de previsão
 limiter = Limiter(key_func=get_remote_address)  # Limitador de requisições, identifica o cliente pelo IP
 
 
 # -------------------------------------------------------------------------------
 # ROTA - Busca previsão pelo ID
 # ---------------------------------------------------------------------------
-@router.get("/predictions/{prediction_id}", summary="Buscar uma previsão do usuário logado", 
+@router.get("/predictions/{prediction_id}", 
+            tags=["Previsões"],
+            summary="Buscar uma previsão do usuário logado", 
             description="""
 Busca uma previsão salva pelo **ID**.
 
@@ -60,7 +62,9 @@ def get_prediction(
 # ------------------------------------------------------------------------------
 # ROTA - Faz a previsão da intenção
 # ---------------------------------------------------------------------------
-@router.post("/predict", summary="Prever a intenção da mensagem", 
+@router.post("/predict", 
+             tags=["Previsões"],
+             summary="Prever a intenção da mensagem", 
              description="""
 Recebe a mensagem do cliente e devolve a **intenção** identificada.
 
@@ -94,7 +98,9 @@ def predict(predictionRequest: PredictionRequest):  # Recebe a mensagem no forma
 # ------------------------------------------------------------------------------
 # ROTA - Valida a mensagem (válida se tiver mais de 5 caracteres)
 # ---------------------------------------------------------------------------
-@router.post("/valid",  summary="Validar a mensagem (mais de 5 caracteres)", 
+@router.post("/valid", 
+             tags=["Previsões"],
+             summary="Validar a mensagem (mais de 5 caracteres)", 
              description="""
 Verifica se a mensagem é **válida** para análise: precisa ter **mais de 5 caracteres**.
 
@@ -122,7 +128,9 @@ def valid(predictionRequest: PredictionRequest):  # Recebe a mensagem no formato
 # -----------------------------------------------------------------------------
 # ROTA - Lista todas as previsões (só para o admin)
 # ---------------------------------------------------------------------------
-@router.get("/predicitons", summary="Listar todas as previsões (só admin)", 
+@router.get("/predicitons", 
+            tags=["Previsões"],
+            summary="Listar todas as previsões (só admin)", 
             description="""
 Lista **todas as previsões** salvas no banco, de todos os usuários.
 
@@ -163,7 +171,8 @@ def get_all_predicitons(
 # ---------------------------------------------------------------------------
 # ROTA - Lista todas as previsões com limite de 5 requisições por minuto
 # ---------------------------------------------------------------------------
-@router.get("/predicitons_limited", 
+@router.get("/predicitons_limited",
+            tags=["Previsões"], 
             summary="Listar todas as previsões com limite de 5 por minuto (só admin)", 
             description="""
 Mesma função da rota de listar todas as previsões, mas com **limite de requisições** (rate limiting).
@@ -209,6 +218,7 @@ def get_all_predicitons_limited(
 # ROTA - Classifica a intenção do usuário pelo teste do EDA
 # ---------------------------------------------------------------------------
 @router.post("/classify_padrao",
+            tags=["Classificações"],
             summary="(Sem LLM) Classificar a intenção da mensagem do usuário",
             description="""
 Descobre qual é a **intenção** da mensagem usando o modelo que treinamos no notebook. Essa rota não usa IA (LLM).
@@ -254,6 +264,7 @@ def classify(request: PredictionRequest):
 # ROTA - Protótipo: sempre devolve "cancelamento" (sem usar o LLM)
 # ---------------------------------------------------------------------------
 @router.post("/classify_semllm",
+            tags=["Classificações"],
             summary="(Sem LLM) Protótipo que sempre responde 'cancelamento'",
             description="""
 Essa rota é só um **teste**. Não usa o modelo nem a IA, então a resposta é **sempre igual**.
@@ -283,6 +294,7 @@ def classify_semllm(predictionRequest: PredictionRequest):
 # ROTA - Usa o agente de IA, que chama o classificador como ferramenta
 # ---------------------------------------------------------------------------
 @router.post("/classify_comllm",
+            tags=["Classificações"],
             summary="(Com LLM) Classificar a intenção usando o agente de IA",
             description="""
 Usa um **agente de IA** para descobrir a intenção. O agente usa o nosso modelo como ferramenta e depois escreve a resposta.

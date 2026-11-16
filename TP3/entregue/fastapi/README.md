@@ -7,10 +7,6 @@ py -m pip install -r requirements.txt
 fastapi dev main.py
 ```
 
-```bash
-uvicorn main:app --port 8000 --reload
-```
-
 ## Rodar Testes Automatizados
 
 ```bash
